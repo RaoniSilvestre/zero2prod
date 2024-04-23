@@ -2,6 +2,10 @@ name: Rust
 
 on: [push, pull_request]
 
+runs:
+  using: 'node20'
+  main: 'main.js'
+
 env:
   CARGO_TERM_COLOR: always
 
