@@ -16,6 +16,7 @@ struct FormData {
 // ------------------------ ENDPOINTS ----------------------------------
 
 async fn health_check() -> HttpResponse {
+    println!("Health checked!");
     HttpResponse::Ok().finish()
 }
 
