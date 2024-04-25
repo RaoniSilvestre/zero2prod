@@ -3,6 +3,7 @@ use zero2prod::startup::spawn_app;
 #[tokio::test]
 async fn health_check_works() {
     let address = spawn_app();
+
     let client = reqwest::Client::new();
 
     let response = client
