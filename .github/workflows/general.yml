@@ -69,7 +69,7 @@ jobs:
       - name: Migrate database
         run: |
           chmod +x ./scripts/init_db.sh
-          ./scripts/init_db.sh
+          SKIP_DOCKER=true ./scripts/init_db.sh
 
       - name: Run tests
         run: cargo test
@@ -120,7 +120,7 @@ jobs:
       - name: Migrate database
         run: |
           chmod +x ./scripts/init_db.sh
-          ./scripts/init_db.sh
+          SKIP_DOCKER=true ./scripts/init_db.sh
       - name: Linting
         run: cargo clippy -- -D warnings
 
@@ -156,6 +156,6 @@ jobs:
       - name: Migrate database
         run: |
           chmod +x ./scripts/init_db.sh
-          ./scripts/init_db.sh
+          SKIP_DOCKER=true ./scripts/init_db.sh
       - name: Generate code coverage
         run: cargo install cargo-tarpaulin && cargo tarpaulin --verbose --workspace
