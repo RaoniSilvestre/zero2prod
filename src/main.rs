@@ -5,6 +5,8 @@ use zero2prod::startup::run;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+
     let configuration = get_configuration().expect("Failed to read configuration");
 
     let address = format!("127.0.0.1:{}", configuration.application_port);
