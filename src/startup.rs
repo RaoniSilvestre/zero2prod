@@ -2,9 +2,11 @@ use actix_web::dev::Server;
 use actix_web::middleware::Logger;
 use actix_web::{web, App, HttpServer};
 use once_cell::sync::Lazy;
+use secrecy::ExposeSecret;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use std::io::stdout;
 use std::net::TcpListener;
+use tracing_actix_web::TracingLogger;
 use uuid::Uuid;
 
 use crate::configuration::{get_configuration, DatabaseSettings};
@@ -34,7 +36,7 @@ pub fn run(listener: TcpListener, pg_pool: PgPool) -> Result<Server, std::io::Er
 
     let server = HttpServer::new(move || {
         App::new()
-            .wrap(Logger::new("%a %{User-Agent}i %s"))
+            .wrap(TracingLogger::default())
             .route("/health_check", web::get().to(health_check))
             .route("/subscriptions", web::post().to(subscribe))
             .app_data(pg_pool.clone())
@@ -68,16 +70,17 @@ pub async fn spawn_app() -> TestApp {
 }
 
 pub async fn configure_database(config: &DatabaseSettings) -> PgPool {
-    let mut connection = PgConnection::connect(&config.connection_string_withouth_db())
-        .await
-        .expect("failed to connect to postgres");
+    let mut connection =
+        PgConnection::connect(&config.connection_string_withouth_db().expose_secret())
+            .await
+            .expect("failed to connect to postgres");
 
     connection
         .execute(format!(r#"CREATE DATABASE "{}";"#, config.database_name).as_str())
         .await
         .expect("Failed to create database");
 
-    let connection_pool = PgPool::connect(&config.connection_string())
+    let connection_pool = PgPool::connect(&config.connection_string().expose_secret())
         .await
         .expect("Failed to connect to postgres");
 
