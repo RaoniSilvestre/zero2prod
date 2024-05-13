@@ -1,9 +1,15 @@
 use secrecy::{ExposeSecret, Secret};
 
 #[derive(serde::Deserialize)]
+pub struct ApplicationSettings {
+    pub port: u16,
+    pub host: String,
+}
+
+#[derive(serde::Deserialize)]
 pub struct Settings {
     pub database: DatabaseSettings,
-    pub application_port: u16,
+    pub application: ApplicationSettings,
 }
 
 #[derive(serde::Deserialize)]
@@ -35,6 +41,32 @@ impl DatabaseSettings {
             self.host,
             self.port
         ))
+    }
+}
+
+pub enum Enviroment {
+    Local,
+    Production,
+}
+
+impl Enviroment {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Enviroment::Local => "local",
+            Enviroment::Production => "production",
+        }
+    }
+}
+
+impl TryFrom<String> for Enviroment {
+    type Error = String;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        match value.to_lowercase().as_str() {
+            "local" => Ok(Self::Local),
+            "production" => Ok(Self::Production),
+            other => Err(format!("{} format not supported", other)),
+        }
     }
 }
 
